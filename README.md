@@ -1,7 +1,43 @@
 #React 강좌를 들으며 학습하는 프로젝트
 
 1. 원 페이지 일기장 만들기
-    -일기장 저장 및 출력
+```javascript
+    /*[일기장 작성, 저장, 출력]*/
+    //일기장 작성은 DiaryEditor.js에서 진행
+    //App.js에서 useState가 들어간 function을 props받아 값을 저장할때 쓰였다.
+    
+    //App.js
+    const onCreate = (author, content, emotion) => {
+    const created_date = new Date().getTime();
+    const newItem = {
+      author,
+      content,
+      emotion,
+      created_date,
+      dataId: dataId.current
+    };
+    dataId.current++;
+    setData([newItem, ...data]);
+  }
+  
+  //DiaryEditor.js
+  const DiaryEditor = ({ onCreate }) => {
+  ...
+  const handleSubmit = () => {
+       ...
+        onCreate(state.author, state.content, state.emotion);
+        alert("저장 성공");
+        setState({
+            author: "", content: "", emotion: 1,
+        })
+    }
+  ...
+  return <div className="DiaryEditor">
+  ...
+  <button type="submit" onClick={handleSubmit}>일기 저장하기</button>
+  ...
+ ```
+    -
     -일기장 삭제 
     -일기장 수정
 2. React Lifecycle 제어하기
