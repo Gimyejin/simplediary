@@ -1,0 +1,63 @@
+.DiaryEditor{
+  border: 1px solid black;
+  text-align: center;
+  padding: 25px;
+  margin: 10px auto;
+  width:450px; 
+}
+.DiaryEditor input,textarea{
+  width: 400px;
+  margin-bottom: 10px;
+  padding: 10px;
+}
+
+.DiaryEditor textarea{
+  height: 150px;
+}
+
+.DiaryEditor select{
+  width: 250px;
+  padding: 5px;
+  margin: 20px;
+}
+
+.DiaryEditor button{
+  width: 400px;
+  padding: 5px;
+  cursor: pointer;
+}
+
+/* List */
+.DiaryList{
+  border: 1px solid black;
+  margin: 10px auto;
+  width:450px; 
+  padding: 25px;
+}
+.DiaryList h2{
+  text-align: center;
+}
+
+/* Item */
+.DiaryItem{
+  background-color: rgb(220,220,220);
+  margin-bottom: 10px;
+  padding: 20px;
+}
+.DiaryItem .info{
+  border-bottom: 1px solid black;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+}
+.DiaryItem .date{
+  color:gray;
+}
+.DiaryItem .content{
+  font-weight: bold;
+  margin-bottom: 30px;
+  padding-top: 30px;
+}
+.DiaryItem .content textarea{
+  width: 400px;
+  height: 100px;
+}
