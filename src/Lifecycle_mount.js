@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-const Lifecycle = () => {
+const Lifecycle_mount = () => {
     const [count, setCount] = useState(0);
     const [text, setText] = useState("");
 
@@ -36,4 +36,4 @@ const Lifecycle = () => {
         <hr />
     </div >
 }
-export default Lifecycle;
+export default Lifecycle_mount;

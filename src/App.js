@@ -3,6 +3,7 @@ import './App.css';
 import DiaryEditor from './DiaryEditor';
 import DiaryList from './DiaryList';
 import Lifecycle_mount from './Lifecycle_mount';
+import Lifecycle_umount from './Lifecycle_unmount';
 
 function App() {
   const [data, setData] = useState([]);
@@ -35,6 +36,7 @@ function App() {
   return (
     <div className='App'>
       <Lifecycle_mount />
+      <Lifecycle_umount />
       <DiaryEditor onCreate={onCreate} />
       <DiaryList onEdit={onEdit} diaryList={data} onRemove={onRemove} />
     </div>
