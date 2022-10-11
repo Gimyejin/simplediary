@@ -1,6 +1,6 @@
 # React 강좌를 들으며 학습하는 프로젝트 #
 
-## 1. 원 페이지 일기장 만들기 ##
+## 1. 원 페이지 일기장 만들기 
 ### 일기장 작성, 저장 ###
 ```javascript
     //일기장 작성은 DiaryEditor.js에서 진행
@@ -100,8 +100,11 @@
  
  ```
  ### 일기장 수정
-2. React Lifecycle 제어하기
-3. React에서 API 호출하기
+
+
+## 2. React Lifecycle 제어하기
+
+## 3. React에서 API 호출하기
 ```javascript
  const res = await fetch('https://jsonplaceholder.typicode.com/comments').then((res) => res.json());
  //에서 fetch 로 리로스를 비동기 요청을 할 수 있다.
@@ -119,3 +122,26 @@
      setData(initData);
 //res에는 500개의 데이터가 들어있는데 res.slice를 이용하여 20개만 자른 뒤 필요한 데이터만 사용하였다.
 ```
+
+## 4. 컴포넌트 트리에 데이터 공급하기 (Context)
+1. 모든 데이터를 가지고 있는 컴포넌트가 Provider라는 공급자 역할을 하는 자식 컴포넌트에게 자신이 가진 모든 데이터를 넘긴다.
+    
+2. 공급자 Provider컴포넌트는 자신의 자손에 해당하는 컴포넌트들에게 직접적으로 데이터를 전달할 수 있다.
+- 자손들은 Provider 컴포넌트에게 직통으로 데이터를 받을 수 있다. 
+- 쓸데없이 props를 전달만하는 코드를 줄일 수 있음
+
+    
+#### Context 생성
+``const MyContext =  React.createContext(defaultValue);``
+
+#### Context Provider를 통한 데이터 공급
+```javascript
+<MyContext.Provider
+  value={전역으로 전달하고자 하는 값}>{ /* 자식 컴포넌트들 */ } 
+</MyContext.Provider>
+```
+
+
+
+    
+    
