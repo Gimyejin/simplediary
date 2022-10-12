@@ -1,4 +1,4 @@
-import { useEffect, useReducer, useRef } from 'react';
+import React, { useEffect, useReducer, useRef } from 'react';
 import './App.css';
 import DiaryEditor from './DiaryEditor';
 import DiaryList from './DiaryList';
@@ -30,6 +30,9 @@ const reducer = (state, action) => {
     }
   }
 }
+
+export const DiaryStateContext = React.createContext();
+
 function App() {
   const [data, dispatch] = useReducer(reducer, []);
   const dataId = useRef(0);
@@ -58,7 +61,6 @@ function App() {
     getData();
   }, [])
   const onCreate = (author, content, emotion) => {
-
     dispatch({
       type: "CREATE",
       data: {
@@ -83,10 +85,12 @@ function App() {
 
 
   return (
-    <div className='App'>
-      <DiaryEditor onCreate={onCreate} />
-      <DiaryList onEdit={onEdit} diaryList={data} onRemove={onRemove} />
-    </div>
+    <DiaryStateContext.Provider value={data}>
+      <div className='App'>
+        <DiaryEditor onCreate={onCreate} />
+        <DiaryList onEdit={onEdit} onRemove={onRemove} />
+      </div>
+    </DiaryStateContext.Provider>
   );
 }
 
