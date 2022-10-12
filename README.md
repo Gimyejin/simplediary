@@ -127,10 +127,247 @@
 ->컴포넌트에서 상태변화를 분리
 ``useState``대신 ``useReduer``를 사용하는 이유는 복잡한 상태변화 로직을 컴포넌트 밖으로 분리하기 위함이다.
 ```javascript
-
+const [data, dispatch] = useReducer(reducer, []);
 ```
 dispatch를 호출하면 reducer()가 작동하고 reducer에서 return한 값이 date(state)에 저장된다.
 
+또한 상태변화 로직을 컴포넌트 밖으로 분리하기 위함으로 reducer()함수는 컴포넌트 밖에다가 정의한다.
+
+```javascript
+const reducer = (state, action) => {
+  switch (action.type) {
+    case "INIT": {    }
+    case "CREATE": {    }
+    case "REMOVE": {    }
+    case "EDIT": {    }
+    default: {return state;}
+  }
+}
+function App() {
+...}
+
+```
+먼저 reducer의 틀을 만들어준다.
+
+여기서 state는 위에서 정의한 data의 값을 가지고 있으며 action에는 dispatch를 호출할때 들어갈 인자값을 가지고 있다.
+
+<details>
+<summary>INIT</summary>
+
+```javascript
+/* 변경 전 init */
+    const initData = res.slice(0, 20).map((it) => {
+      return {
+        author: it.email,
+        content: it.body,
+        emotion: Math.floor(Math.random() * 5) + 1,
+        created_date: new Date().getTime(),
+        id: dataId.current++
+      }
+    })
+    setData(initData);
+  };
+  
+  
+/* 변경 후 init */
+    const initData = res.slice(0, 20).map((it) => {
+      return {
+        author: it.email,
+        content: it.body,
+        emotion: Math.floor(Math.random() * 5) + 1,
+        created_date: new Date().getTime(),
+        dataId: dataId.current++
+      }
+    })
+    dispatch({ type: "INIT", data: initData })
+  };
+```
+
+해당 부분에서는 ``setData(initData)``만 수정되었다. <br />
+그리고 reducer()에는 아래와 같이 추가해준다.
+
+```javascript
+const reducer = (state, action) => {
+  switch (action.type) {
+    case "INIT": {  
+        return action.data
+    }
+    case "CREATE": {    }
+    case "REMOVE": {    }
+    case "EDIT": {    }
+    default: {return state;}
+  }
+}
+function App() {
+...}
+```
+
+</details>
+
+<details>
+<summary>CREATE</summary>
+
+```javascript
+/* 변경 전 create  */
+  const onCreate = (author, content, emotion) => {
+    const created_date = new Date().getTime();
+    const newItem = {
+      author,
+      content,
+      emotion,
+      created_date,
+      dataId: dataId.current
+    };
+    dataId.current++;
+    setData([newItem, ...data]);
+  }
+  
+  
+/* 변경 후 create */
+  const onCreate = (author, content, emotion) => {
+    dispatch({
+      type: "CREATE",
+      data: {
+        author,
+        content,
+        emotion,
+        dataId: dataId.current
+      }
+    })
+    dataId.current++;
+  }
+```
+
+바로 ``dispatch``로 인자값을 전달하고 작성 시간은 ``reducer()``에서 추가한다.
+
+```javascript
+const reducer = (state, action) => {
+  switch (action.type) {
+    case "INIT": {  
+        return action.data
+    }
+    case "CREATE": {
+      const create_date = new Date().getTime();
+      const newItem = {
+        ...action.data,
+        create_date,
+      }
+      return [newItem, ...state];
+    }
+    case "REMOVE": {    }
+    case "EDIT": {    }
+    default: {return state;}
+  }
+}
+function App() {
+...}
+```
+
+</details>
+
+<details>
+<summary>REMOVE</summary>
+
+```javascript
+/* 변경 전 remove  */
+  const onRemove = (targetId) => {
+    const newDiaryList = data.filter((data) => data.dataId !== targetId);
+    setData(newDiaryList);
+  }
+  
+  
+/* 변경 후 remove */
+  const onRemove = (targetId) => {
+    dispatch({ type: "REMOVE", targetId })
+  }
+```
+
+``dispatch``에는 type값과 targetId를 전달한다.
+
+```javascript
+const reducer = (state, action) => {
+  switch (action.type) {
+    case "INIT": {  
+        return action.data
+    }
+    case "CREATE": {
+      const create_date = new Date().getTime();
+      const newItem = {
+        ...action.data,
+        create_date,
+      }
+      return [newItem, ...state];
+    }
+    case "REMOVE": {
+      return state.filter((it) => it.dataId !== action.targetId)
+    }
+    case "EDIT": {    }
+    default: {return state;}
+  }
+}
+function App() {
+...}
+```
+
+``state.filter``를 사용하여 ``dataId``와 ``targetId``가 일치하지 않는 데이터들만 저장하며 리턴한다.
+
+</details>
+
+<details>
+<summary>EDIT</summary>
+
+```javascript
+/* 변경 전 edit  */
+  const onEdit = (targetId, newContent) => {
+    setData(
+      data.map(it => it.dataId === targetId ? { ...it, content: newContent } : it
+      )
+    );
+  };
+  
+  
+/* 변경 후 edit */
+  const onEdit = (targetId, newContent) => {
+    dispatch({
+      type: "EDIT", targetId, newContent
+    })
+  }
+```
+
+``setData``대신 ``dispatch``를 사용하여 type과 targetId, newContent값을 전달한다.
+
+```javascript
+const reducer = (state, action) => {
+  switch (action.type) {
+    case "INIT": {  
+        return action.data
+    }
+    case "CREATE": {
+      const create_date = new Date().getTime();
+      const newItem = {
+        ...action.data,
+        create_date,
+      }
+      return [newItem, ...state];
+    }
+    case "REMOVE": {
+      return state.filter((it) => it.dataId !== action.targetId)
+    }
+    case "EDIT": {
+      return state.map(it => it.dataId === action.targetId ? {
+        ...it, content: action.newContent
+      } : it)
+    }
+    default: {return state;}
+  }
+}
+function App() {
+...}
+```
+
+</details>
+
+<br />
 
 
 ## 5. 컴포넌트 트리에 데이터 공급하기 (Context)
@@ -151,7 +388,70 @@ dispatch를 호출하면 reducer()가 작동하고 reducer에서 return한 값�
 </MyContext.Provider>
 ```
 
+이제 직접 코드에 적용해본다.
+
+```javascript
+/* App.js */
+export const DiaryStateContext = React.createContext();
+```
+
+위의 코드를 추가하였다면 return에서도 수정할 부분이 생긴다.
+
+```javascript
+return (
+    <DiaryStateContext.Provider value={data}>
+      <div className='App'>
+        <DiaryEditor onCreate={onCreate} />
+        <DiaryList onEdit={onEdit} onRemove={onRemove} />
+      </div>
+    </DiaryStateContext.Provider>
+  );
+```
+
+DiaryStateContext 컨텍스트가 가지고 있는 provider라는 컴포넌트를 사용한다.<br />
+App컴포넌트가 return하고 있는 태그를 ``<DiaryStateContext.Provier>``태그로 랩핑해준다.
+
+그리고 전역으로 쓰고싶은 값을 ``<DiaryStateContext.Provier>``태그의 value라는 prop으로 지정해주면 된다.
+
+<br/>
+
+![ex_screenshot](./img/img1.png)
+
+개발툴의 Componenets를 확인해보면 Context.Provider가 태그들의 상위에 있으며 props에는 value에 data값을 가지고 있는 것을 알 수 있다.
+<br />
+
+##### 자손이 Provier값을 사용하기
+
+```javascript
+/* DirayList.js */
+import { useContext } from "react";
+import { DiaryStateContext } from "./App";
+import DiaryItem from "./DiaryItem";
+
+const DiaryList = ({ onRemove, onEdit }) => {
+    const diaryList = useContext(DiaryStateContext);
+    
+    return <div className="DiaryList">
+        <h2>일기 리스트</h2>
+        <h4>{diaryList.length}개의 일기가 있습니다.</h4>
+        <div>
+            {diaryList.map((it) => (
+                <DiaryItem key={it.dataId} {...it} onRemove={onRemove} onEdit={onEdit} />
+            ))}
+        </div>
+    </div>
+}
+
+```
+
+provider에게 data를 받으면 되기 때문에 prop으로 받은 dataList은 지워두었다.<br />
+``provider``의 값을 사용할 때는 **``useContext()``** 라는 hook을 사용한다. <br/><br/>
+대신 ``useContext()``를 사용할때 한가지 인자를 전달해야하는데, 우리가 값을 꺼내고 싶은 context를 전달하면 된다.
+(현재 코드에서는 ``DiaryStateContext``를 import를 받아 사용하면 된다)
+
+![ex_screenshot](./img/img2.png)
 
 
+DiaryList를 보면 hooks에 data값들을 받아오고 있는 것을 확인 할 수 있다.
     
     
