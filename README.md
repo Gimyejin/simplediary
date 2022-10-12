@@ -381,7 +381,7 @@ function App() {
 #### Context 생성
 ``const MyContext =  React.createContext(defaultValue);``
 
-#### Context Provider를 통한 데이터 공급
+#### Context Provider를 통한 데이터 공급 (data)
 ```javascript
 <MyContext.Provider
   value={전역으로 전달하고자 하는 값}>{ /* 자식 컴포넌트들 */ } 
@@ -453,5 +453,54 @@ provider에게 data를 받으면 되기 때문에 prop으로 받은 dataList은 
 
 
 DiaryList를 보면 hooks에 data값들을 받아오고 있는 것을 확인 할 수 있다.
-    
-    
+     
+#### Context Provider를 통한 데이터 공급 (onCreate, onRemove, onEdit...)
+해당 기능들도 provider로 공급할 수 있다.
+하지만 provdier도 결국에는 컴포넌트이다. 즉  prop이 바꿔버리면 재 생성되버린다 -> 하위이 컴포넌트들도 모두 재 생성된다.
+그러니 data와 같은 context를 사용하지 않고 중첩하여 사용한다.
+
+```javascript
+export const DiaryDispatchContext = React.createContext();
+
+...
+
+const memoizeDispatch = useMemo(() => {
+    return { onCreate, onRemove, onEdit }
+  }, [])
+
+  return (
+    <DiaryStateContext.Provider value={data}>
+      <DiaryDispatchContext.Provider value={memoizeDispatch}>
+        <div className='App'>
+          <DiaryEditor />
+          <DiaryList />
+        </div>
+      </DiaryDispatchContext.Provider>
+    </DiaryStateContext.Provider>
+  );
+```
+
+useMemo를 사용하지 않을 경우 App컴퍼런트가 재 생성 될 때 dispatcth객체도 같이 재생성되버린다. <br/>
+그러니 최적화가 풀리지 않게 useMemo로 묶어서 value값으로 사용한다.
+
+
+```javascript
+/*DiaryEditor 의 onCreate 수정 */
+const DiaryEditor = () => {
+    const onCreate = useContext(DiaryDispatchContext);
+    ...
+```
+
+
+```javascript
+/*DiaryItem onRemove, onEdit 수정 */
+const DiaryItem = ({
+    author,
+    content,
+    created_date,
+    emotion,
+    dataId
+}) => {
+    const { onRemove, onEdit } = useContext(DiaryDispatchContext);
+    ...
+```
