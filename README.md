@@ -388,7 +388,70 @@ function App() {
 </MyContext.Provider>
 ```
 
+이제 직접 코드에 적용해본다.
+
+```javascript
+/* App.js */
+export const DiaryStateContext = React.createContext();
+```
+
+위의 코드를 추가하였다면 return에서도 수정할 부분이 생긴다.
+
+```javascript
+return (
+    <DiaryStateContext.Provider value={data}>
+      <div className='App'>
+        <DiaryEditor onCreate={onCreate} />
+        <DiaryList onEdit={onEdit} onRemove={onRemove} />
+      </div>
+    </DiaryStateContext.Provider>
+  );
+```
+
+DiaryStateContext 컨텍스트가 가지고 있는 provider라는 컴포넌트를 사용한다.<br />
+App컴포넌트가 return하고 있는 태그를 ``<DiaryStateContext.Provier>``태그로 랩핑해준다.
+
+그리고 전역으로 쓰고싶은 값을 ``<DiaryStateContext.Provier>``태그의 value라는 prop으로 지정해주면 된다.
+
+<br/>
+
+![ex_screenshot](./img/img1.png)
+
+개발툴의 Componenets를 확인해보면 Context.Provider가 태그들의 상위에 있으며 props에는 value에 data값을 가지고 있는 것을 알 수 있다.
+<br />
+
+##### 자손이 Provier값을 사용하기
+
+```javascript
+/* DirayList.js */
+import { useContext } from "react";
+import { DiaryStateContext } from "./App";
+import DiaryItem from "./DiaryItem";
+
+const DiaryList = ({ onRemove, onEdit }) => {
+    const diaryList = useContext(DiaryStateContext);
+    
+    return <div className="DiaryList">
+        <h2>일기 리스트</h2>
+        <h4>{diaryList.length}개의 일기가 있습니다.</h4>
+        <div>
+            {diaryList.map((it) => (
+                <DiaryItem key={it.dataId} {...it} onRemove={onRemove} onEdit={onEdit} />
+            ))}
+        </div>
+    </div>
+}
+
+```
+
+provider에게 data를 받으면 되기 때문에 prop으로 받은 dataList은 지워두었다.<br />
+``provider``의 값을 사용할 때는 **``useContext()``** 라는 hook을 사용한다. <br/><br/>
+대신 ``useContext()``를 사용할때 한가지 인자를 전달해야하는데, 우리가 값을 꺼내고 싶은 context를 전달하면 된다.
+(현재 코드에서는 ``DiaryStateContext``를 import를 받아 사용하면 된다)
+
+![ex_screenshot](./img/img2.png)
 
 
+DiaryList를 보면 hooks에 data값들을 받아오고 있는 것을 확인 할 수 있다.
     
     
