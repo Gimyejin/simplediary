@@ -18,15 +18,16 @@ const reducer = (state, action) => {
       return [newItem, ...state];
     }
     case "REMOVE": {
-
+      return state.filter((it) => it.dataId !== action.targetId)
     }
     case "EDIT": {
-
+      return state.map(it => it.dataId === action.targetId ? {
+        ...it, content: action.newContent
+      } : it)
     }
     default: {
-
-    }
       return state;
+    }
   }
 }
 function App() {
@@ -71,18 +72,16 @@ function App() {
   }
 
   const onRemove = (targetId) => {
-    const newDiaryList = data.filter((data) => data.dataId !== targetId);
-    dispatch({ type: "REMOVE", data: newDiaryList })
+    dispatch({ type: "REMOVE", targetId })
   }
 
   const onEdit = (targetId, newContent) => {
     dispatch({
-      type: "EDIT",
-      data: data.map(it => it.dataId === targetId ? { ...it, content: newContent } : it
-      )
+      type: "EDIT", targetId, newContent
     })
+  }
 
-  };
+
   return (
     <div className='App'>
       <DiaryEditor onCreate={onCreate} />
