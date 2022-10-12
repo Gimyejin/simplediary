@@ -1,4 +1,4 @@
-import React, { useEffect, useReducer, useRef } from 'react';
+import React, { useEffect, useMemo, useReducer, useRef } from 'react';
 import './App.css';
 import DiaryEditor from './DiaryEditor';
 import DiaryList from './DiaryList';
@@ -32,10 +32,14 @@ const reducer = (state, action) => {
 }
 
 export const DiaryStateContext = React.createContext();
+export const DiaryDispatchContext = React.createContext();
 
 function App() {
   const [data, dispatch] = useReducer(reducer, []);
   const dataId = useRef(0);
+
+
+
 
   //api를 이용해서 적절히 데이터를 가공해서 초기 값을 설정해봄
   const getData = async () => {
@@ -60,6 +64,7 @@ function App() {
   useEffect(() => {
     getData();
   }, [])
+
   const onCreate = (author, content, emotion) => {
     dispatch({
       type: "CREATE",
@@ -83,13 +88,19 @@ function App() {
     })
   }
 
+  //해당 기능들은 절대 재생성되는 일이 없도록 deps를 빈 배열로 사용 
+  const memoizeDispatch = useMemo(() => {
+    return { onCreate, onRemove, onEdit }
+  }, [])
 
   return (
     <DiaryStateContext.Provider value={data}>
-      <div className='App'>
-        <DiaryEditor onCreate={onCreate} />
-        <DiaryList onEdit={onEdit} onRemove={onRemove} />
-      </div>
+      <DiaryDispatchContext.Provider value={memoizeDispatch}>
+        <div className='App'>
+          <DiaryEditor />
+          <DiaryList />
+        </div>
+      </DiaryDispatchContext.Provider>
     </DiaryStateContext.Provider>
   );
 }
